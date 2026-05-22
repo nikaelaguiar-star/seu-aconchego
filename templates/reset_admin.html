@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reset Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: linear-gradient(135deg, #7c3aed, #4f46e5); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .card { background: #fff; border-radius: 24px; padding: 32px 28px; width: 100%; max-width: 380px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+    h2 { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+    p { color: #64748b; font-size: 13px; margin-bottom: 24px; }
+    .form-group { margin-bottom: 14px; }
+    label { font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 5px; }
+    input { width: 100%; padding: 12px 14px; border-radius: 12px; border: 1.5px solid #e9e3f5; background: #f8f5ff; font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; }
+    input:focus { border-color: #7c3aed; background: #fff; }
+    .btn { width: 100%; padding: 13px; background: linear-gradient(135deg, #7c3aed, #4f46e5); color: #fff; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 8px; }
+    .erro { background: #fee2e2; color: #dc2626; border-radius: 10px; padding: 10px 14px; font-size: 14px; margin-bottom: 14px; }
+    .ok { background: #dcfce7; color: #16a34a; border-radius: 10px; padding: 16px; font-size: 14px; text-align: center; }
+    .ok a { color: #16a34a; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>🔑 Resetar Admin</h2>
+    <p>Use o código secreto para recriar o usuário administrador.</p>
+    {% if ok %}
+      <div class="ok">✅ Admin criado com sucesso!<br><br><a href="/login">→ Ir para o Login</a></div>
+    {% else %}
+      {% if erro %}<div class="erro">⚠️ {{ erro }}</div>{% endif %}
+      <form method="POST">
+        <div class="form-group">
+          <label>Código Secreto</label>
+          <input type="password" name="codigo" placeholder="••••••••••" required>
+        </div>
+        <div class="form-group">
+          <label>Nome</label>
+          <input type="text" name="nome" placeholder="Seu nome" required>
+        </div>
+        <div class="form-group">
+          <label>E-mail</label>
+          <input type="email" name="email" placeholder="seu@email.com" required>
+        </div>
+        <div class="form-group">
+          <label>Nova Senha</label>
+          <input type="password" name="senha" placeholder="Mínimo 6 caracteres" required minlength="6">
+        </div>
+        <button type="submit" class="btn">Recriar Admin</button>
+      </form>
+    {% endif %}
+  </div>
+</body>
+</html>
