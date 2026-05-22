@@ -1,6 +1,6 @@
-# Seu Aconchego — Sistema de Reservas
+# 🏡 Seu Aconchego — Sistema de Reservas
 
-## Como colocar no ar (gratuito)
+## 📱 Como colocar no ar (gratuito)
 
 ### Passo 1 — Crie uma conta no GitHub
 1. Acesse https://github.com e clique em **Sign up**
@@ -21,7 +21,7 @@
 4. Selecione o repositório `seu-aconchego`
 5. Render vai detectar o `render.yaml` automaticamente
 6. Clique em **Create Web Service**
-7. Aguarde ~2 minutos
+7. Aguarde ~2 minutos ☕
 
 ### Passo 4 — Acesse no celular
 - Render vai gerar um link tipo: `https://seu-aconchego.onrender.com`
@@ -30,14 +30,14 @@
 
 ---
 
-## Observação importante
+## ⚠️ Observação importante
 O plano gratuito do Render "dorme" após 15 min de inatividade.
 Na primeira vez que abrir, pode demorar ~30 segundos para carregar.
 Para uso contínuo, considere o plano pago ($7/mês).
 
 ---
 
-## Estrutura dos arquivos
+## 🗂️ Estrutura dos arquivos
 ```
 seu_aconchego/
 ├── app.py              # Backend Flask
@@ -48,11 +48,11 @@ seu_aconchego/
 └── render.yaml         # Config do deploy
 ```
 
-##  Funcionalidades
--  Cadastro de reservas
--  Edição e exclusão
--  Controle de status (Pago / Pendente / Inadimplente / Cancelado)
--  Filtros por status
--  Painel com contagem de reservas
--  Interface responsiva para celular
--  Banco de dados SQLite (persistente no Render)
+## 🚀 Funcionalidades
+- ✅ Cadastro de reservas
+- ✅ Edição e exclusão
+- ✅ Controle de status (Pago / Pendente / Inadimplente / Cancelado)
+- ✅ Filtros por status
+- ✅ Painel com contagem de reservas
+- ✅ Interface responsiva para celular
+- ✅ Banco de dados SQLite (persistente no Render)
