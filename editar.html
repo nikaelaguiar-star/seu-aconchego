@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editar Reserva - Seu Aconchego</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --purple: #7c3aed; --purple-dark: #4f46e5; --bg: #f8f5ff; --card: #fff; --border: #e9e3f5; --muted: #64748b; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); min-height: 100vh; }
+    header {
+      background: linear-gradient(135deg, #7c3aed, #4f46e5);
+      padding: 16px 20px; display: flex; align-items: center; gap: 12px;
+    }
+    .back-btn { background: rgba(255,255,255,0.2); border: none; color: #fff; padding: 8px 14px; border-radius: 10px; font-size: 14px; cursor: pointer; text-decoration: none; }
+    header h1 { font-family: 'Playfair Display', serif; color: #fff; font-size: 18px; }
+    .form-wrap { padding: 20px 16px 40px; max-width: 480px; margin: 0 auto; }
+    .card { background: var(--card); border-radius: 20px; padding: 24px 20px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px; }
+    .form-group input, .form-group select {
+      width: 100%; padding: 12px 14px; border-radius: 12px;
+      border: 1px solid var(--border); background: var(--bg);
+      font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none;
+    }
+    .form-group input:focus, .form-group select:focus { border-color: var(--purple); background: var(--card); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .btn-primary {
+      width: 100%; padding: 14px; background: linear-gradient(135deg, #7c3aed, #4f46e5);
+      color: #fff; border: none; border-radius: 14px; font-size: 15px; font-weight: 700;
+      cursor: pointer; margin-top: 8px; font-family: 'DM Sans', sans-serif;
+    }
+    .btn-cancel {
+      width: 100%; padding: 12px; background: none;
+      color: var(--muted); border: none; font-size: 14px;
+      cursor: pointer; margin-top: 6px; font-family: 'DM Sans', sans-serif;
+      text-decoration: none; display: block; text-align: center;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <a href="/" class="back-btn">← Voltar</a>
+  <h1>Editar Reserva</h1>
+</header>
+<div class="form-wrap">
+  <div class="card">
+    <form method="POST">
+      <div class="form-group">
+        <label>Nome Completo *</label>
+        <input type="text" name="nome" value="{{ r['nome'] }}" required>
+      </div>
+      <div class="form-group">
+        <label>Endereço</label>
+        <input type="text" name="endereco" value="{{ r['endereco'] or '' }}">
+      </div>
+      <div class="form-group">
+        <label>Contato</label>
+        <input type="text" name="contato" value="{{ r['contato'] or '' }}">
+      </div>
+      <div class="form-group">
+        <label>Valor (R$)</label>
+        <input type="number" name="valor" value="{{ r['valor'] or '' }}" step="0.01">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Entrada *</label>
+          <input type="datetime-local" name="entrada" value="{{ r['entrada'] }}" required>
+        </div>
+        <div class="form-group">
+          <label>Saída *</label>
+          <input type="datetime-local" name="saida" value="{{ r['saida'] }}" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select name="status">
+          <option value="pendente" {{ 'selected' if r['status']=='pendente' }}>⏳ Pendente</option>
+          <option value="pago" {{ 'selected' if r['status']=='pago' }}>✅ Pago</option>
+          <option value="inadimplente" {{ 'selected' if r['status']=='inadimplente' }}>⚠️ Inadimplente</option>
+          <option value="cancelado" {{ 'selected' if r['status']=='cancelado' }}>⊘ Cancelado</option>
+        </select>
+      </div>
+      <button type="submit" class="btn-primary">💾 Salvar Alterações</button>
+      <a href="/" class="btn-cancel">Cancelar</a>
+    </form>
+  </div>
+</div>
+</body>
+</html>

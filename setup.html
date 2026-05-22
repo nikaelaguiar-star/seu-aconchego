@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configuração Inicial — Seu Aconchego</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --purple: #7c3aed; --bg: #f8f5ff; --border: #e9e3f5; --muted: #64748b; --red: #dc2626; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: linear-gradient(135deg, #7c3aed, #4f46e5);
+      min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;
+    }
+    .card { background: #fff; border-radius: 24px; padding: 36px 28px; width: 100%; max-width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+    .badge { background: #fef3c7; color: #d97706; border-radius: 99px; padding: 4px 14px; font-size: 12px; font-weight: 700; display: inline-block; margin-bottom: 16px; }
+    h1 { font-family: 'Playfair Display', serif; font-size: 22px; margin-bottom: 6px; }
+    p { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px; }
+    .form-group input { width: 100%; padding: 12px 14px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--bg); font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; }
+    .form-group input:focus { border-color: var(--purple); background: #fff; }
+    .btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #7c3aed, #4f46e5); color: #fff; border: none; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; margin-top: 8px; }
+    .erro { background: #fee2e2; color: var(--red); border-radius: 10px; padding: 10px 14px; font-size: 14px; margin-bottom: 14px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <span class="badge">⚙️ Primeiro acesso</span>
+    <h1>Criar conta Admin</h1>
+    <p>Configure o administrador principal do sistema. Esse passo só aparece uma vez.</p>
+    {% if erro %}<div class="erro">⚠️ {{ erro }}</div>{% endif %}
+    <form method="POST">
+      <div class="form-group">
+        <label>Nome</label>
+        <input type="text" name="nome" placeholder="Seu nome" required>
+      </div>
+      <div class="form-group">
+        <label>E-mail</label>
+        <input type="email" name="email" placeholder="admin@email.com" required>
+      </div>
+      <div class="form-group">
+        <label>Senha (mín. 6 caracteres)</label>
+        <input type="password" name="senha" placeholder="••••••••" required minlength="6">
+      </div>
+      <button type="submit" class="btn">🚀 Criar e entrar</button>
+    </form>
+  </div>
+</body>
+</html>

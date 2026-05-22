@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Seu Aconchego">
+  <title>Seu Aconchego</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --purple: #7c3aed;
+      --purple-dark: #4f46e5;
+      --green: #16a34a;
+      --yellow: #d97706;
+      --red: #dc2626;
+      --gray: #6b7280;
+      --bg: #f8f5ff;
+      --card: #ffffff;
+      --text: #1e1b2e;
+      --muted: #64748b;
+      --border: #e9e3f5;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* HEADER */
+    header {
+      background: linear-gradient(135deg, #7c3aed, #4f46e5);
+      padding: 16px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 12px rgba(79,70,229,0.3);
+    }
+    .logo { display: flex; align-items: center; gap: 10px; }
+    .logo-icon { font-size: 26px; }
+    .logo-text { color: #fff; }
+    .logo-text h1 { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; line-height: 1; }
+    .logo-text span { font-size: 11px; color: #c4b5fd; }
+    .header-btn {
+      background: rgba(255,255,255,0.15); color: #fff; border: none;
+      border-radius: 10px; padding: 8px 14px; font-size: 13px; font-weight: 600;
+      cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+    }
+    .header-btn:hover { background: rgba(255,255,255,0.25); }
+
+    /* STATS BAR */
+    .stats-bar {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 0; background: var(--card);
+      border-bottom: 1px solid var(--border);
+    }
+    .stat-item {
+      padding: 12px 8px; text-align: center;
+      border-right: 1px solid var(--border);
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-num { font-size: 22px; font-weight: 700; line-height: 1; }
+    .stat-label { font-size: 10px; color: var(--muted); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .c-green { color: var(--green); }
+    .c-yellow { color: var(--yellow); }
+    .c-red { color: var(--red); }
+    .c-purple { color: var(--purple); }
+
+    /* FILTERS */
+    .filters {
+      padding: 14px 16px; display: flex; gap: 8px; overflow-x: auto;
+      scrollbar-width: none; background: var(--card);
+      border-bottom: 1px solid var(--border);
+    }
+    .filters::-webkit-scrollbar { display: none; }
+    .filter-btn {
+      white-space: nowrap; padding: 6px 14px; border-radius: 99px;
+      border: 1px solid var(--border); background: var(--bg);
+      font-size: 12px; font-weight: 600; cursor: pointer; color: var(--muted);
+      text-decoration: none; transition: all 0.2s;
+    }
+    .filter-btn.active, .filter-btn:hover { background: var(--purple); color: #fff; border-color: var(--purple); }
+
+    /* SEARCH */
+    .search-wrap { padding: 12px 16px; background: var(--bg); }
+    .search-wrap input {
+      width: 100%; padding: 11px 16px; border-radius: 12px;
+      border: 1px solid var(--border); background: var(--card);
+      font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none;
+    }
+    .search-wrap input:focus { border-color: var(--purple); }
+
+    /* CARDS */
+    .cards { padding: 0 16px 100px; display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
+    .card {
+      background: var(--card); border-radius: 16px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+      overflow: hidden;
+    }
+    .card-top {
+      padding: 16px 16px 12px;
+      border-left: 4px solid var(--purple);
+    }
+    .card-top.pago { border-color: var(--green); }
+    .card-top.pendente { border-color: var(--yellow); }
+    .card-top.inadimplente { border-color: var(--red); }
+    .card-top.cancelado { border-color: var(--gray); }
+
+    .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+    .card-name { font-weight: 700; font-size: 16px; }
+    .badge {
+      font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 99px;
+    }
+    .badge.pago { background: #dcfce7; color: var(--green); }
+    .badge.pendente { background: #fef3c7; color: var(--yellow); }
+    .badge.inadimplente { background: #fee2e2; color: var(--red); }
+    .badge.cancelado { background: #f3f4f6; color: var(--gray); }
+
+    .card-info { font-size: 13px; color: var(--muted); line-height: 1.8; }
+    .card-dates {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 8px; margin-top: 10px; padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+    .date-box { background: var(--bg); border-radius: 8px; padding: 8px 10px; }
+    .date-box .dl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .date-box .dv { font-size: 13px; font-weight: 600; margin-top: 2px; }
+    .valor-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+    .valor { font-size: 18px; font-weight: 800; color: var(--purple); }
+
+    /* CARD ACTIONS */
+    .card-actions {
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      border-top: 1px solid var(--border);
+    }
+    .action-btn {
+      padding: 11px 8px; text-align: center; font-size: 12px; font-weight: 600;
+      cursor: pointer; border: none; background: var(--card);
+      text-decoration: none; color: var(--text);
+      border-right: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+    .action-btn:last-child { border-right: none; }
+    .action-btn:hover { background: var(--bg); }
+    .action-btn.danger { color: var(--red); }
+    .action-btn.success { color: var(--green); }
+
+    /* STATUS SELECT */
+    .status-form { padding: 10px 16px; background: var(--bg); border-top: 1px solid var(--border); }
+    .status-form select {
+      width: 100%; padding: 8px 12px; border-radius: 10px;
+      border: 1px solid var(--border); background: var(--card);
+      font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; outline: none;
+    }
+
+    /* EMPTY STATE */
+    .empty { text-align: center; padding: 60px 20px; color: var(--muted); }
+    .empty-icon { font-size: 56px; margin-bottom: 12px; }
+    .empty h3 { font-size: 17px; margin-bottom: 6px; color: var(--text); }
+    .empty p { font-size: 14px; }
+
+    /* FAB */
+    .fab {
+      position: fixed; bottom: 24px; right: 20px; z-index: 200;
+      background: linear-gradient(135deg, #7c3aed, #4f46e5);
+      color: #fff; border: none; border-radius: 99px;
+      padding: 14px 22px; font-size: 15px; font-weight: 700;
+      box-shadow: 0 4px 20px rgba(124,58,237,0.45);
+      cursor: pointer; text-decoration: none;
+      display: flex; align-items: center; gap: 8px;
+      transition: transform 0.2s;
+    }
+    .fab:hover { transform: scale(1.05); }
+
+    /* MODAL */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5); z-index: 300;
+      align-items: flex-end; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--card); border-radius: 24px 24px 0 0;
+      padding: 24px 20px 40px; width: 100%; max-width: 480px;
+      animation: slideUp 0.3s ease;
+    }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .modal h3 { font-family: 'Playfair Display', serif; font-size: 20px; margin-bottom: 20px; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px; }
+    .form-group input, .form-group select {
+      width: 100%; padding: 12px 14px; border-radius: 12px;
+      border: 1px solid var(--border); background: var(--bg);
+      font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none;
+    }
+    .form-group input:focus, .form-group select:focus { border-color: var(--purple); background: var(--card); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .btn-primary {
+      width: 100%; padding: 14px; background: linear-gradient(135deg, #7c3aed, #4f46e5);
+      color: #fff; border: none; border-radius: 14px; font-size: 15px; font-weight: 700;
+      cursor: pointer; margin-top: 8px; font-family: 'DM Sans', sans-serif;
+    }
+    .btn-cancel {
+      width: 100%; padding: 12px; background: none;
+      color: var(--muted); border: none; font-size: 14px;
+      cursor: pointer; margin-top: 6px; font-family: 'DM Sans', sans-serif;
+    }
+
+    /* DELETE CONFIRM */
+    .confirm-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5); z-index: 400;
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .confirm-overlay.open { display: flex; }
+    .confirm-box {
+      background: var(--card); border-radius: 20px; padding: 28px 24px;
+      text-align: center; max-width: 320px; width: 100%;
+    }
+    .confirm-box .icon { font-size: 44px; margin-bottom: 12px; }
+    .confirm-box h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+    .confirm-box p { font-size: 14px; color: var(--muted); margin-bottom: 20px; }
+    .confirm-btns { display: flex; gap: 10px; }
+    .btn-confirm-cancel { flex: 1; padding: 11px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg); cursor: pointer; font-weight: 600; font-family: 'DM Sans', sans-serif; }
+    .btn-confirm-delete { flex: 1; padding: 11px; border-radius: 12px; border: none; background: var(--red); color: #fff; cursor: pointer; font-weight: 700; font-family: 'DM Sans', sans-serif; }
+
+    @media (min-width: 600px) {
+      .cards { max-width: 600px; margin: 12px auto 100px; }
+      .stats-bar { max-width: 600px; margin: 0 auto; }
+      .filters { max-width: 600px; margin: 0 auto; }
+      .search-wrap { max-width: 600px; margin: 0 auto; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">🏡</div>
+    <div class="logo-text">
+      <h1>Seu Aconchego</h1>
+      <span>Gestão de Reservas</span>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;">
+    {% if session.get('perfil') == 'admin' %}
+    <a href="/usuarios" class="header-btn" style="font-size:12px;">👥</a>
+    {% endif %}
+    <a href="/logout" class="header-btn" style="font-size:12px;">
+      <span style="display:none;display:inline;">{{ session.get('usuario_nome','').split()[0] }}</span> Sair
+    </a>
+  </div>
+</header>
+
+<!-- STATS -->
+{% set total = reservas|length %}
+{% set pagos = reservas|selectattr('status','eq','pago')|list|length %}
+{% set pendentes = reservas|selectattr('status','eq','pendente')|list|length %}
+{% set inadimplentes = reservas|selectattr('status','eq','inadimplente')|list|length %}
+<div class="stats-bar">
+  <div class="stat-item"><div class="stat-num c-purple">{{ total }}</div><div class="stat-label">Total</div></div>
+  <div class="stat-item"><div class="stat-num c-green">{{ pagos }}</div><div class="stat-label">Pagos</div></div>
+  <div class="stat-item"><div class="stat-num c-yellow">{{ pendentes }}</div><div class="stat-label">Pend.</div></div>
+  <div class="stat-item"><div class="stat-num c-red">{{ inadimplentes }}</div><div class="stat-label">Inadimp.</div></div>
+</div>
+
+<!-- FILTERS -->
+<div class="filters">
+  <a href="/" class="filter-btn {{ 'active' if not request.args.get('filtro') }}">Todos</a>
+  <a href="/?filtro=pago" class="filter-btn {{ 'active' if request.args.get('filtro')=='pago' }}">✅ Pagos</a>
+  <a href="/?filtro=pendente" class="filter-btn {{ 'active' if request.args.get('filtro')=='pendente' }}">⏳ Pendentes</a>
+  <a href="/?filtro=inadimplente" class="filter-btn {{ 'active' if request.args.get('filtro')=='inadimplente' }}">⚠️ Inadimplentes</a>
+  <a href="/?filtro=cancelado" class="filter-btn {{ 'active' if request.args.get('filtro')=='cancelado' }}">⊘ Cancelados</a>
+</div>
+
+<!-- CARDS -->
+<div class="cards">
+  {% set filtro = request.args.get('filtro') %}
+  {% set lista = reservas if not filtro else reservas|selectattr('status','eq',filtro)|list %}
+  {% if lista %}
+    {% for r in lista %}
+    <div class="card">
+      <div class="card-top {{ r['status'] }}">
+        <div class="card-header">
+          <div class="card-name">{{ r['nome'] }}</div>
+          <span class="badge {{ r['status'] }}">
+            {% if r['status'] == 'pago' %}✓ Pago
+            {% elif r['status'] == 'pendente' %}⏳ Pendente
+            {% elif r['status'] == 'inadimplente' %}⚠️ Inadimplente
+            {% else %}⊘ Cancelado{% endif %}
+          </span>
+        </div>
+        <div class="card-info">
+          {% if r['endereco'] %}📍 {{ r['endereco'] }}<br>{% endif %}
+          {% if r['contato'] %}📞 {{ r['contato'] }}{% endif %}
+        </div>
+        <div class="card-dates">
+          <div class="date-box">
+            <div class="dl">Entrada</div>
+            <div class="dv">{{ r['entrada']|replace('T',' ') }}</div>
+          </div>
+          <div class="date-box">
+            <div class="dl">Saída</div>
+            <div class="dv">{{ r['saida']|replace('T',' ') }}</div>
+          </div>
+        </div>
+        {% if r['valor'] %}
+        <div class="valor-row">
+          <span style="font-size:13px;color:var(--muted)">Valor</span>
+          <span class="valor">R$ {{ "%.2f"|format(r['valor']|float) }}</span>
+        </div>
+        {% endif %}
+      </div>
+
+      <div class="status-form">
+        <form method="POST" action="/status/{{ r['id'] }}">
+          <select name="status" onchange="this.form.submit()">
+            <option value="pendente" {{ 'selected' if r['status']=='pendente' }}>⏳ Pendente</option>
+            <option value="pago" {{ 'selected' if r['status']=='pago' }}>✅ Pago</option>
+            <option value="inadimplente" {{ 'selected' if r['status']=='inadimplente' }}>⚠️ Inadimplente</option>
+            <option value="cancelado" {{ 'selected' if r['status']=='cancelado' }}>⊘ Cancelado</option>
+          </select>
+        </form>
+      </div>
+
+      <div class="card-actions">
+        <a href="/editar/{{ r['id'] }}" class="action-btn">✏️ Editar</a>
+        <button class="action-btn success" onclick="confirmarPago({{ r['id'] }})">💰 Pago</button>
+        <button class="action-btn danger" onclick="confirmarDelete({{ r['id'] }})">🗑️ Excluir</button>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="empty">
+      <div class="empty-icon">🏡</div>
+      <h3>Nenhuma reserva encontrada</h3>
+      <p>Toque no botão abaixo para cadastrar.</p>
+    </div>
+  {% endif %}
+</div>
+
+<!-- FAB -->
+<button class="fab" onclick="abrirModal()">➕ Nova Reserva</button>
+
+<!-- MODAL NOVA RESERVA -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3>🏡 Nova Reserva</h3>
+    <form method="POST" action="/nova">
+      <div class="form-group">
+        <label>Nome Completo *</label>
+        <input type="text" name="nome" placeholder="Ex: Maria Silva" required>
+      </div>
+      <div class="form-group">
+        <label>Endereço</label>
+        <input type="text" name="endereco" placeholder="Ex: Rua das Flores, 123">
+      </div>
+      <div class="form-group">
+        <label>Contato</label>
+        <input type="text" name="contato" placeholder="Ex: (61) 99999-0000">
+      </div>
+      <div class="form-group">
+        <label>Valor (R$)</label>
+        <input type="number" name="valor" placeholder="Ex: 300" step="0.01">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Entrada *</label>
+          <input type="datetime-local" name="entrada" required>
+        </div>
+        <div class="form-group">
+          <label>Saída *</label>
+          <input type="datetime-local" name="saida" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select name="status">
+          <option value="pendente">⏳ Pendente</option>
+          <option value="pago">✅ Pago</option>
+          <option value="inadimplente">⚠️ Inadimplente</option>
+          <option value="cancelado">⊘ Cancelado</option>
+        </select>
+      </div>
+      <button type="submit" class="btn-primary">✅ Cadastrar Reserva</button>
+      <button type="button" class="btn-cancel" onclick="fecharModal()">Cancelar</button>
+    </form>
+  </div>
+</div>
+
+<!-- CONFIRM DELETE -->
+<div class="confirm-overlay" id="confirm">
+  <div class="confirm-box">
+    <div class="icon">🗑️</div>
+    <h3>Excluir reserva?</h3>
+    <p>Essa ação não pode ser desfeita.</p>
+    <div class="confirm-btns">
+      <button class="btn-confirm-cancel" onclick="fecharConfirm()">Cancelar</button>
+      <form id="deleteForm" method="POST">
+        <button type="submit" class="btn-confirm-delete">Excluir</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function abrirModal() { document.getElementById('modal').classList.add('open'); }
+  function fecharModal() { document.getElementById('modal').classList.remove('open'); }
+  function confirmarDelete(id) {
+    document.getElementById('deleteForm').action = '/excluir/' + id;
+    document.getElementById('confirm').classList.add('open');
+  }
+  function fecharConfirm() { document.getElementById('confirm').classList.remove('open'); }
+  function confirmarPago(id) {
+    if(confirm('Marcar como Pago?')) {
+      const f = document.createElement('form');
+      f.method = 'POST'; f.action = '/status/' + id;
+      const i = document.createElement('input');
+      i.type = 'hidden'; i.name = 'status'; i.value = 'pago';
+      f.appendChild(i); document.body.appendChild(f); f.submit();
+    }
+  }
+  document.getElementById('modal').addEventListener('click', function(e) {
+    if(e.target === this) fecharModal();
+  });
+  document.getElementById('confirm').addEventListener('click', function(e) {
+    if(e.target === this) fecharConfirm();
+  });
+</script>
+</body>
+</html>
