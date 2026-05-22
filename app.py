@@ -223,6 +223,32 @@ def setup():
     conn.close()
     return render_template("setup.html", erro=erro)
 
+
+# ── ROTA TEMPORÁRIA DE RESET (remover após uso) ───────
+@app.route("/reset-admin", methods=["GET", "POST"])
+def reset_admin():
+    erro = None
+    ok = False
+    if request.method == "POST":
+        codigo = request.form.get("codigo", "")
+        if codigo != "seuaconchego2026":
+            erro = "Código incorreto."
+        else:
+            nome = request.form["nome"].strip()
+            email = request.form["email"].strip().lower()
+            senha = request.form["senha"]
+            if len(senha) < 6:
+                erro = "Senha muito curta."
+            else:
+                conn = get_db()
+                conn.execute("DELETE FROM usuarios")
+                conn.execute("INSERT INTO usuarios (nome, email, senha, perfil) VALUES (?,?,?,?)",
+                             (nome, email, hash_senha(senha), "admin"))
+                conn.commit()
+                conn.close()
+                ok = True
+    return render_template("reset_admin.html", erro=erro, ok=ok)
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
