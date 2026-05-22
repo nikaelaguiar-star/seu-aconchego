@@ -36,6 +36,9 @@ def init_db():
     conn.commit()
     conn.close()
 
+# Roda sempre que o módulo é carregado (funciona com gunicorn)
+init_db()
+
 def hash_senha(senha):
     return hashlib.sha256(senha.encode()).hexdigest()
 
@@ -221,7 +224,5 @@ def setup():
     return render_template("setup.html", erro=erro)
 
 if __name__ == "__main__":
-    init_db()
-    # Redireciona para setup se não houver usuários
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
