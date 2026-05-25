@@ -5,13 +5,16 @@ import hashlib
 import secrets
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY", secrets.token_hex(32))
+app.secret_key = os.environ.get("SECRET_KEY", "seuaconchego_secret_2026")
 DB = "seu_aconchego.db"
 
 def get_db():
     conn = sqlite3.connect(DB)
     conn.row_factory = sqlite3.Row
     return conn
+
+def hash_senha(senha):
+    return hashlib.sha256(senha.encode()).hexdigest()
 
 def init_db():
     conn = get_db()
@@ -34,13 +37,17 @@ def init_db():
         criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )''')
     conn.commit()
+    # Cria admin padrão se não existir nenhum usuário
+    existe = conn.execute("SELECT id FROM usuarios LIMIT 1").fetchone()
+    if not existe:
+        conn.execute(
+            "INSERT INTO usuarios (nome, email, senha, perfil) VALUES (?,?,?,?)",
+            ("Administrador", "admin@seuaconchego.com", hash_senha("admin123"), "admin")
+        )
+        conn.commit()
     conn.close()
 
-# Roda sempre que o módulo é carregado (funciona com gunicorn)
 init_db()
-
-def hash_senha(senha):
-    return hashlib.sha256(senha.encode()).hexdigest()
 
 def login_required(f):
     from functools import wraps
@@ -106,7 +113,7 @@ def nova():
     conn = get_db()
     conn.execute(
         "INSERT INTO reservas (nome, endereco, contato, entrada, saida, status, valor) VALUES (?,?,?,?,?,?,?)",
-        (d["nome"], d["endereco"], d["contato"], d["entrada"], d["saida"], d["status"], d.get("valor", 0))
+        (d["nome"], d["endereco"], d["contato"], d["entrada"], d["saida"], d["status"], d.get("valor") or 0)
     )
     conn.commit()
     conn.close()
@@ -120,7 +127,7 @@ def editar(id):
         d = request.form
         conn.execute(
             "UPDATE reservas SET nome=?, endereco=?, contato=?, entrada=?, saida=?, status=?, valor=? WHERE id=?",
-            (d["nome"], d["endereco"], d["contato"], d["entrada"], d["saida"], d["status"], d.get("valor", 0), id)
+            (d["nome"], d["endereco"], d["contato"], d["entrada"], d["saida"], d["status"], d.get("valor") or 0, id)
         )
         conn.commit()
         conn.close()
@@ -146,6 +153,32 @@ def excluir(id):
     conn.commit()
     conn.close()
     return redirect(url_for("index"))
+
+# ── MINHA CONTA ───────────────────────────────────────
+
+@app.route("/minha-conta", methods=["GET", "POST"])
+@login_required
+def minha_conta():
+    msg = None
+    erro = None
+    if request.method == "POST":
+        senha_atual = hash_senha(request.form["senha_atual"])
+        nova_senha = request.form["nova_senha"]
+        confirma = request.form["confirma_senha"]
+        conn = get_db()
+        user = conn.execute("SELECT * FROM usuarios WHERE id=? AND senha=?", (session["usuario_id"], senha_atual)).fetchone()
+        if not user:
+            erro = "Senha atual incorreta."
+        elif len(nova_senha) < 6:
+            erro = "Nova senha deve ter pelo menos 6 caracteres."
+        elif nova_senha != confirma:
+            erro = "As senhas não coincidem."
+        else:
+            conn.execute("UPDATE usuarios SET senha=? WHERE id=?", (hash_senha(nova_senha), session["usuario_id"]))
+            conn.commit()
+            msg = "Senha alterada com sucesso!"
+        conn.close()
+    return render_template("minha_conta.html", msg=msg, erro=erro)
 
 # ── USUÁRIOS (admin) ──────────────────────────────────
 
@@ -190,64 +223,12 @@ def excluir_usuario(id):
 @app.route("/usuarios/senha/<int:id>", methods=["POST"])
 @admin_required
 def trocar_senha(id):
-    nova = hash_senha(request.form["nova_senha"])
     conn = get_db()
-    conn.execute("UPDATE usuarios SET senha=? WHERE id=?", (nova, id))
+    conn.execute("UPDATE usuarios SET senha=? WHERE id=?", (hash_senha(request.form["nova_senha"]), id))
     conn.commit()
     conn.close()
     flash("Senha atualizada!", "success")
     return redirect(url_for("usuarios"))
-
-# ── PRIMEIRO ACESSO ───────────────────────────────────
-
-@app.route("/setup", methods=["GET", "POST"])
-def setup():
-    conn = get_db()
-    existe = conn.execute("SELECT id FROM usuarios LIMIT 1").fetchone()
-    if existe:
-        conn.close()
-        return redirect(url_for("login"))
-    erro = None
-    if request.method == "POST":
-        nome = request.form["nome"].strip()
-        email = request.form["email"].strip().lower()
-        senha = request.form["senha"]
-        if len(senha) < 6:
-            erro = "A senha deve ter pelo menos 6 caracteres."
-        else:
-            conn.execute("INSERT INTO usuarios (nome, email, senha, perfil) VALUES (?,?,?,?)",
-                         (nome, email, hash_senha(senha), "admin"))
-            conn.commit()
-            conn.close()
-            return redirect(url_for("login"))
-    conn.close()
-    return render_template("setup.html", erro=erro)
-
-
-# ── ROTA TEMPORÁRIA DE RESET (remover após uso) ───────
-@app.route("/reset-admin", methods=["GET", "POST"])
-def reset_admin():
-    erro = None
-    ok = False
-    if request.method == "POST":
-        codigo = request.form.get("codigo", "")
-        if codigo != "seuaconchego2026":
-            erro = "Código incorreto."
-        else:
-            nome = request.form["nome"].strip()
-            email = request.form["email"].strip().lower()
-            senha = request.form["senha"]
-            if len(senha) < 6:
-                erro = "Senha muito curta."
-            else:
-                conn = get_db()
-                conn.execute("DELETE FROM usuarios")
-                conn.execute("INSERT INTO usuarios (nome, email, senha, perfil) VALUES (?,?,?,?)",
-                             (nome, email, hash_senha(senha), "admin"))
-                conn.commit()
-                conn.close()
-                ok = True
-    return render_template("reset_admin.html", erro=erro, ok=ok)
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
