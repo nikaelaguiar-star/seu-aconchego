@@ -243,6 +243,7 @@
     {% if session.get('perfil') == 'admin' %}
     <a href="/usuarios" class="header-btn" style="font-size:12px;">👥</a>
     {% endif %}
+    <a href="/minha-conta" class="header-btn" style="font-size:12px;">👤 Conta</a>
     <a href="/logout" class="header-btn" style="font-size:12px;">
       <span style="display:none;display:inline;">{{ session.get('usuario_nome','').split()[0] }}</span> Sair
     </a>
