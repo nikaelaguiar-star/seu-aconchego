@@ -6,52 +6,42 @@
   <title>Usuários — Seu Aconchego</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    :root { --purple: #7c3aed; --purple-dark: #4f46e5; --bg: #f8f5ff; --card: #fff; --border: #e9e3f5; --muted: #64748b; --red: #dc2626; --green: #16a34a; }
+    :root { --purple: #7c3aed; --bg: #f8f5ff; --card: #fff; --border: #e9e3f5; --muted: #64748b; --red: #dc2626; --green: #16a34a; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'DM Sans', sans-serif; background: var(--bg); min-height: 100vh; }
     header { background: linear-gradient(135deg, #7c3aed, #4f46e5); padding: 16px 20px; display: flex; align-items: center; gap: 12px; }
-    .back-btn { background: rgba(255,255,255,0.2); border: none; color: #fff; padding: 8px 14px; border-radius: 10px; font-size: 14px; cursor: pointer; text-decoration: none; }
+    .back-btn { background: rgba(255,255,255,0.2); border: none; color: #fff; padding: 8px 14px; border-radius: 10px; font-size: 14px; text-decoration: none; }
     header h1 { font-family: 'Playfair Display', serif; color: #fff; font-size: 18px; }
     .wrap { padding: 20px 16px 40px; max-width: 540px; margin: 0 auto; }
-
     .flash { padding: 12px 16px; border-radius: 12px; margin-bottom: 16px; font-size: 14px; font-weight: 500; }
     .flash.success { background: #dcfce7; color: var(--green); }
     .flash.error { background: #fee2e2; color: var(--red); }
-
-    .section-title { font-weight: 700; font-size: 15px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-
-    /* NOVO USUÁRIO */
+    .section-title { font-weight: 700; font-size: 15px; margin-bottom: 12px; }
     .card { background: var(--card); border-radius: 16px; padding: 20px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); margin-bottom: 24px; }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .form-group { margin-bottom: 12px; }
-    .form-group label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 5px; }
-    .form-group input, .form-group select { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg); font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; }
-    .form-group input:focus, .form-group select:focus { border-color: var(--purple); background: #fff; }
+    label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 5px; }
+    input, select { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg); font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; }
+    input:focus, select:focus { border-color: var(--purple); background: #fff; }
     .btn-primary { padding: 11px 20px; background: linear-gradient(135deg, #7c3aed, #4f46e5); color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; width: 100%; margin-top: 4px; }
-
-    /* LISTA */
     .user-card { background: var(--card); border-radius: 14px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 10px; }
-    .user-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .user-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
     .user-name { font-weight: 700; font-size: 15px; }
     .badge { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 99px; }
     .badge.admin { background: #ede9fe; color: var(--purple); }
     .badge.usuario { background: #f1f5f9; color: var(--muted); }
-    .user-email { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+    .user-login { font-size: 13px; color: var(--muted); margin-bottom: 4px; }
     .user-date { font-size: 11px; color: #94a3b8; }
     .user-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
-
-    /* MODAL SENHA */
+    .btn-sm { padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; font-family: 'DM Sans', sans-serif; }
+    .btn-danger { background: #fee2e2; color: var(--red); }
+    .btn-edit { background: #eff6ff; color: #3b82f6; }
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 300; align-items: flex-end; justify-content: center; }
     .modal-overlay.open { display: flex; }
     .modal { background: var(--card); border-radius: 24px 24px 0 0; padding: 24px 20px 40px; width: 100%; max-width: 480px; }
     .modal h3 { font-size: 17px; font-weight: 700; margin-bottom: 16px; }
-    .btn-sm { padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; font-family: 'DM Sans', sans-serif; }
-    .btn-danger { background: #fee2e2; color: var(--red); }
-    .btn-edit { background: #eff6ff; color: #3b82f6; }
     .btn-save { background: linear-gradient(135deg, #7c3aed, #4f46e5); color: #fff; }
-    .btn-cancel-sm { background: var(--bg); color: var(--muted); border: 1px solid var(--border); }
-
-    /* CONFIRM DELETE */
+    .btn-cancel-sm { background: var(--bg); color: var(--muted); border: 1px solid var(--border) !important; }
     .confirm-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 400; align-items: center; justify-content: center; padding: 20px; }
     .confirm-overlay.open { display: flex; }
     .confirm-box { background: var(--card); border-radius: 20px; padding: 28px 24px; text-align: center; max-width: 300px; width: 100%; }
@@ -69,14 +59,12 @@
   <h1>👥 Usuários</h1>
 </header>
 <div class="wrap">
-
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% for cat, msg in messages %}
       <div class="flash {{ cat }}">{{ msg }}</div>
     {% endfor %}
   {% endwith %}
 
-  <!-- NOVO USUÁRIO -->
   <div class="section-title">➕ Novo Usuário</div>
   <div class="card">
     <form method="POST" action="/usuarios/novo">
@@ -88,59 +76,58 @@
         <div class="form-group">
           <label>Perfil</label>
           <select name="perfil">
-            <option value="usuario">Usuário</option>
-            <option value="admin">Admin</option>
+            <option value="usuario">👤 Usuário</option>
+            <option value="admin">👑 Admin</option>
           </select>
         </div>
       </div>
-      <div class="form-group">
-        <label>E-mail</label>
-        <input type="email" name="email" placeholder="email@exemplo.com" required>
-      </div>
-      <div class="form-group">
-        <label>Senha</label>
-        <input type="password" name="senha" placeholder="Mínimo 6 caracteres" required minlength="6">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Login</label>
+          <input type="text" name="login" placeholder="Ex: maria" required>
+        </div>
+        <div class="form-group">
+          <label>Senha</label>
+          <input type="password" name="senha" placeholder="Mín. 6 caracteres" required minlength="6">
+        </div>
       </div>
       <button type="submit" class="btn-primary">✅ Criar Usuário</button>
     </form>
   </div>
 
-  <!-- LISTA -->
-  <div class="section-title">👤 Usuários Cadastrados ({{ usuarios|length }})</div>
+  <div class="section-title">👤 Cadastrados ({{ usuarios|length }})</div>
   {% for u in usuarios %}
   <div class="user-card">
     <div class="user-header">
       <div class="user-name">{{ u['nome'] }}</div>
       <span class="badge {{ u['perfil'] }}">{{ '👑 Admin' if u['perfil']=='admin' else '👤 Usuário' }}</span>
     </div>
-    <div class="user-email">📧 {{ u['email'] }}</div>
+    <div class="user-login">🔑 Login: <strong>{{ u['login'] }}</strong></div>
     <div class="user-date">Cadastrado em {{ u['criado_em'][:10] }}</div>
     <div class="user-actions">
-      <button class="btn-sm btn-edit" onclick="abrirSenha({{ u['id'] }}, '{{ u['nome'] }}')">🔑 Trocar senha</button>
+      <button class="btn-sm btn-edit" onclick="abrirSenha({{ u['id'] }}, '{{ u['nome'] }}')">🔒 Trocar senha</button>
       <button class="btn-sm btn-danger" onclick="confirmarDelete({{ u['id'] }}, '{{ u['nome'] }}')">🗑️ Excluir</button>
     </div>
   </div>
   {% endfor %}
 </div>
 
-<!-- MODAL TROCAR SENHA -->
 <div class="modal-overlay" id="modalSenha">
   <div class="modal">
-    <h3 id="modalTitle">🔑 Trocar Senha</h3>
+    <h3 id="modalTitle">🔒 Trocar Senha</h3>
     <form id="senhaForm" method="POST">
       <div class="form-group">
         <label>Nova Senha</label>
         <input type="password" name="nova_senha" placeholder="Mínimo 6 caracteres" required minlength="6" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--bg);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;">
       </div>
       <div style="display:flex;gap:10px;margin-top:8px;">
-        <button type="submit" class="btn-sm btn-save" style="flex:1;padding:12px;">💾 Salvar</button>
+        <button type="submit" class="btn-sm btn-save" style="flex:1;padding:12px;border:none;">💾 Salvar</button>
         <button type="button" class="btn-sm btn-cancel-sm" style="flex:1;padding:12px;" onclick="fecharSenha()">Cancelar</button>
       </div>
     </form>
   </div>
 </div>
 
-<!-- CONFIRM DELETE -->
 <div class="confirm-overlay" id="confirm">
   <div class="confirm-box">
     <div class="icon">🗑️</div>
@@ -148,8 +135,8 @@
     <p id="confirmMsg">Essa ação não pode ser desfeita.</p>
     <div class="confirm-btns">
       <button class="btn-confirm-cancel" onclick="fecharConfirm()">Cancelar</button>
-      <form id="deleteForm" method="POST">
-        <button type="submit" class="btn-confirm-delete">Excluir</button>
+      <form id="deleteForm" method="POST" style="flex:1;">
+        <button type="submit" class="btn-confirm-delete" style="width:100%;">Excluir</button>
       </form>
     </div>
   </div>
@@ -157,13 +144,13 @@
 
 <script>
   function abrirSenha(id, nome) {
-    document.getElementById('modalTitle').textContent = '🔑 Trocar Senha — ' + nome;
+    document.getElementById('modalTitle').textContent = '🔒 Trocar Senha — ' + nome;
     document.getElementById('senhaForm').action = '/usuarios/senha/' + id;
     document.getElementById('modalSenha').classList.add('open');
   }
   function fecharSenha() { document.getElementById('modalSenha').classList.remove('open'); }
   function confirmarDelete(id, nome) {
-    document.getElementById('confirmMsg').textContent = 'Remover "' + nome + '"? Essa ação não pode ser desfeita.';
+    document.getElementById('confirmMsg').textContent = 'Remover "' + nome + '"?';
     document.getElementById('deleteForm').action = '/usuarios/excluir/' + id;
     document.getElementById('confirm').classList.add('open');
   }

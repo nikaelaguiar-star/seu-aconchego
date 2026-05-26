@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Seu Aconchego</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --purple: #7c3aed; --bg: #f8f5ff; --card: #fff; --border: #e9e3f5; --muted: #64748b; --green: #16a34a; --yellow: #d97706; --red: #dc2626; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); min-height: 100vh; }
+    header { background: linear-gradient(135deg, #7c3aed, #4f46e5); padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .back-btn { background: rgba(255,255,255,0.2); border: none; color: #fff; padding: 8px 14px; border-radius: 10px; font-size: 14px; cursor: pointer; text-decoration: none; }
+    header h1 { font-family: 'Playfair Display', serif; color: #fff; font-size: 18px; }
+    .wrap { padding: 20px 16px 60px; max-width: 680px; margin: 0 auto; }
+
+    /* TOTAIS */
+    .totais { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+    .stat { background: var(--card); border-radius: 14px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); border-top: 3px solid var(--purple); }
+    .stat.green { border-color: var(--green); }
+    .stat.yellow { border-color: var(--yellow); }
+    .stat.red { border-color: var(--red); }
+    .stat-num { font-size: 26px; font-weight: 800; color: var(--purple); line-height: 1; }
+    .stat.green .stat-num { color: var(--green); }
+    .stat.yellow .stat-num { color: var(--yellow); }
+    .stat.red .stat-num { color: var(--red); }
+    .stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+    /* RECEITA */
+    .receita-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 28px; }
+    .rec-card { background: var(--card); border-radius: 14px; padding: 14px 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); text-align: center; }
+    .rec-val { font-size: 17px; font-weight: 800; }
+    .rec-label { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+    /* TABELA MENSAL */
+    .section-title { font-weight: 700; font-size: 16px; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+    .mes-card { background: var(--card); border-radius: 14px; padding: 18px 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); margin-bottom: 12px; }
+    .mes-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .mes-nome { font-size: 17px; font-weight: 700; }
+    .mes-total { background: #ede9fe; color: var(--purple); border-radius: 99px; padding: 4px 12px; font-size: 13px; font-weight: 700; }
+    .mes-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+    .mes-stat { background: var(--bg); border-radius: 10px; padding: 10px 8px; text-align: center; }
+    .mes-stat-num { font-size: 20px; font-weight: 800; }
+    .mes-stat-label { font-size: 10px; color: var(--muted); margin-top: 2px; }
+    .barra-wrap { background: #f1f5f9; border-radius: 99px; height: 8px; overflow: hidden; }
+    .barra { height: 100%; border-radius: 99px; background: var(--green); }
+    .receita-mes { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+    .receita-val { font-size: 16px; font-weight: 800; color: var(--green); }
+
+    .empty { text-align: center; padding: 40px; color: var(--muted); }
+    .empty-icon { font-size: 48px; margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+<header>
+  <div class="header-left">
+    <a href="/" class="back-btn">← Voltar</a>
+    <h1>📊 Dashboard</h1>
+  </div>
+</header>
+<div class="wrap">
+
+  <!-- TOTAIS GERAIS -->
+  <div class="totais" style="margin-top:4px;">
+    <div class="stat">
+      <div class="stat-num">{{ totais['total'] or 0 }}</div>
+      <div class="stat-label">📋 Total de reservas</div>
+    </div>
+    <div class="stat green">
+      <div class="stat-num">{{ totais['pagos'] or 0 }}</div>
+      <div class="stat-label">✅ Pagos</div>
+    </div>
+    <div class="stat yellow">
+      <div class="stat-num">{{ totais['pendentes'] or 0 }}</div>
+      <div class="stat-label">⏳ Pendentes</div>
+    </div>
+    <div class="stat red">
+      <div class="stat-num">{{ totais['inadimplentes'] or 0 }}</div>
+      <div class="stat-label">⚠️ Inadimplentes</div>
+    </div>
+  </div>
+
+  <!-- RECEITA -->
+  <div class="receita-grid">
+    <div class="rec-card">
+      <div class="rec-val" style="color:var(--green)">R$ {{ "%.0f"|format((totais['receita_total'] or 0)|float) }}</div>
+      <div class="rec-label">💰 Receita confirmada</div>
+    </div>
+    <div class="rec-card">
+      <div class="rec-val" style="color:var(--yellow)">R$ {{ "%.0f"|format((totais['a_receber'] or 0)|float) }}</div>
+      <div class="rec-label">🕐 A receber</div>
+    </div>
+    <div class="rec-card">
+      <div class="rec-val" style="color:var(--red)">R$ {{ "%.0f"|format((totais['perdas'] or 0)|float) }}</div>
+      <div class="rec-label">📉 Perdas</div>
+    </div>
+  </div>
+
+  <!-- POR MÊS -->
+  <div class="section-title">📅 Aluguéis por Mês</div>
+
+  {% if por_mes %}
+    {% for m in por_mes %}
+      {% set partes = m['mes'].split('-') %}
+      {% set nome_mes = meses_nomes.get(partes[1], partes[1]) + '/' + partes[0] %}
+      {% set pct = ((m['pagos'] or 0) / m['total'] * 100) if m['total'] > 0 else 0 %}
+      <div class="mes-card">
+        <div class="mes-header">
+          <div class="mes-nome">{{ nome_mes }}</div>
+          <span class="mes-total">{{ m['total'] }} aluguel{% if m['total'] != 1 %}éis{% endif %}</span>
+        </div>
+        <div class="mes-stats">
+          <div class="mes-stat">
+            <div class="mes-stat-num" style="color:var(--green)">{{ m['pagos'] or 0 }}</div>
+            <div class="mes-stat-label">✅ Pagos</div>
+          </div>
+          <div class="mes-stat">
+            <div class="mes-stat-num" style="color:var(--yellow)">{{ m['pendentes'] or 0 }}</div>
+            <div class="mes-stat-label">⏳ Pendentes</div>
+          </div>
+          <div class="mes-stat">
+            <div class="mes-stat-num" style="color:var(--red)">{{ m['inadimplentes'] or 0 }}</div>
+            <div class="mes-stat-label">⚠️ Inadimp.</div>
+          </div>
+        </div>
+        <div class="barra-wrap">
+          <div class="barra" style="width:{{ pct }}%"></div>
+        </div>
+        <div class="receita-mes">
+          <span style="font-size:12px;color:var(--muted)">{{ "%.0f"|format(pct) }}% pago</span>
+          <span class="receita-val">R$ {{ "%.2f"|format((m['receita'] or 0)|float) }}</span>
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="empty">
+      <div class="empty-icon">📊</div>
+      <p>Nenhuma reserva cadastrada ainda.</p>
+    </div>
+  {% endif %}
+
+</div>
+</body>
+</html>
