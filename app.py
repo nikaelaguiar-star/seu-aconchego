@@ -2,7 +2,6 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 import sqlite3
 import os
 import hashlib
-import secrets
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "seuaconchego_secret_2026")
@@ -31,18 +30,17 @@ def init_db():
     conn.execute('''CREATE TABLE IF NOT EXISTS usuarios (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nome TEXT NOT NULL,
-        email TEXT UNIQUE NOT NULL,
+        login TEXT UNIQUE NOT NULL,
         senha TEXT NOT NULL,
         perfil TEXT DEFAULT 'usuario',
         criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )''')
     conn.commit()
-    # Cria admin padrão se não existir nenhum usuário
     existe = conn.execute("SELECT id FROM usuarios LIMIT 1").fetchone()
     if not existe:
         conn.execute(
-            "INSERT INTO usuarios (nome, email, senha, perfil) VALUES (?,?,?,?)",
-            ("Administrador", "admin@seuaconchego.com", hash_senha("admin123"), "admin")
+            "INSERT INTO usuarios (nome, login, senha, perfil) VALUES (?,?,?,?)",
+            ("Administrador", "admin", hash_senha("admin123"), "admin")
         )
         conn.commit()
     conn.close()
@@ -78,17 +76,18 @@ def login():
         return redirect(url_for("index"))
     erro = None
     if request.method == "POST":
-        email = request.form["email"].strip().lower()
+        login_input = request.form["login"].strip().lower()
         senha = hash_senha(request.form["senha"])
         conn = get_db()
-        user = conn.execute("SELECT * FROM usuarios WHERE email=? AND senha=?", (email, senha)).fetchone()
+        user = conn.execute("SELECT * FROM usuarios WHERE login=? AND senha=?", (login_input, senha)).fetchone()
         conn.close()
         if user:
             session["usuario_id"] = user["id"]
             session["usuario_nome"] = user["nome"]
+            session["usuario_login"] = user["login"]
             session["perfil"] = user["perfil"]
             return redirect(url_for("index"))
-        erro = "E-mail ou senha incorretos."
+        erro = "Login ou senha incorretos."
     return render_template("login.html", erro=erro)
 
 @app.route("/logout")
@@ -154,6 +153,47 @@ def excluir(id):
     conn.close()
     return redirect(url_for("index"))
 
+# ── DASHBOARD ─────────────────────────────────────────
+
+@app.route("/dashboard")
+@login_required
+def dashboard():
+    conn = get_db()
+    # Aluguéis por mês (baseado na data de entrada)
+    por_mes = conn.execute("""
+        SELECT 
+            strftime('%Y-%m', entrada) as mes,
+            COUNT(*) as total,
+            SUM(CASE WHEN status='pago' THEN 1 ELSE 0 END) as pagos,
+            SUM(CASE WHEN status='pendente' THEN 1 ELSE 0 END) as pendentes,
+            SUM(CASE WHEN status='inadimplente' THEN 1 ELSE 0 END) as inadimplentes,
+            SUM(CASE WHEN status='pago' THEN valor ELSE 0 END) as receita
+        FROM reservas
+        GROUP BY mes
+        ORDER BY mes DESC
+        LIMIT 12
+    """).fetchall()
+
+    # Totais gerais
+    totais = conn.execute("""
+        SELECT
+            COUNT(*) as total,
+            SUM(CASE WHEN status='pago' THEN 1 ELSE 0 END) as pagos,
+            SUM(CASE WHEN status='pendente' THEN 1 ELSE 0 END) as pendentes,
+            SUM(CASE WHEN status='inadimplente' THEN 1 ELSE 0 END) as inadimplentes,
+            SUM(CASE WHEN status='pago' THEN valor ELSE 0 END) as receita_total,
+            SUM(CASE WHEN status='pendente' THEN valor ELSE 0 END) as a_receber,
+            SUM(CASE WHEN status='inadimplente' THEN valor ELSE 0 END) as perdas
+        FROM reservas
+    """).fetchone()
+    conn.close()
+
+    meses_nomes = {
+        '01':'Jan','02':'Fev','03':'Mar','04':'Abr','05':'Mai','06':'Jun',
+        '07':'Jul','08':'Ago','09':'Set','10':'Out','11':'Nov','12':'Dez'
+    }
+    return render_template("dashboard.html", por_mes=por_mes, totais=totais, meses_nomes=meses_nomes)
+
 # ── MINHA CONTA ───────────────────────────────────────
 
 @app.route("/minha-conta", methods=["GET", "POST"])
@@ -186,7 +226,7 @@ def minha_conta():
 @admin_required
 def usuarios():
     conn = get_db()
-    lista = conn.execute("SELECT id, nome, email, perfil, criado_em FROM usuarios ORDER BY criado_em DESC").fetchall()
+    lista = conn.execute("SELECT id, nome, login, perfil, criado_em FROM usuarios ORDER BY criado_em DESC").fetchall()
     conn.close()
     return render_template("usuarios.html", usuarios=lista)
 
@@ -194,16 +234,16 @@ def usuarios():
 @admin_required
 def novo_usuario():
     nome = request.form["nome"].strip()
-    email = request.form["email"].strip().lower()
+    login_novo = request.form["login"].strip().lower()
     senha = hash_senha(request.form["senha"])
     perfil = request.form.get("perfil", "usuario")
     conn = get_db()
     try:
-        conn.execute("INSERT INTO usuarios (nome, email, senha, perfil) VALUES (?,?,?,?)", (nome, email, senha, perfil))
+        conn.execute("INSERT INTO usuarios (nome, login, senha, perfil) VALUES (?,?,?,?)", (nome, login_novo, senha, perfil))
         conn.commit()
         flash("Usuário criado com sucesso!", "success")
     except sqlite3.IntegrityError:
-        flash("E-mail já cadastrado.", "error")
+        flash("Login já cadastrado.", "error")
     conn.close()
     return redirect(url_for("usuarios"))
 
